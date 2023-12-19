@@ -1,0 +1,6 @@
+8.1 Basic 
+- Functions and macros in CMake have very similar characteristics to their same-named counterparts in C/C+
+- Functions introduce a new scope and the function arguments become variables accessible inside the function 
+body
+- Macros, on the other hand, effectively paste their body into the point of the call and the macro arguments 
+are substituted as simple string replacement
