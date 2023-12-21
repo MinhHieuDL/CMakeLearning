@@ -4,3 +4,66 @@
 body
 - Macros, on the other hand, effectively paste their body into the point of the call and the macro arguments 
 are substituted as simple string replacement
+*** Syntax:
+function(name [arg1 [arg2 [...]]])
+    #funtion body
+endfuntion()
+
+macro(name [arg1 [arg2 [...]]])
+    #macro body
+endmacro()
+
+8.2 Argument handling essentials
+- The argument handling of functions and macros is the same except for one very important difference:
+    + For functions, each argument is a CMake variable and has all the usual behaviors of a CMake variable. For example, 
+    they can be tested in if() statements as variables
+    + In comparison, macro arguments are string replacements, so whatever was used as the argument to the macro call
+    is essentially pasted into wherever that argument appears in the macro body. If a macro argument is used in an if() statement,
+    it would be treated as a string rather than a variable
+- The value of that argument can be accessed in the function or macro body using the usual variable notation, even though macro 
+arguments are not technically variables.
+- Set of automatically defined variables (or variable-like names in the case of macros) which allow processing of arguments 
+in addition to or instead of the named ones:
+ARGC: total number of arguments passed to function (include named and unamed arguments)
+ARGV: a list contain each of the arguments passed to the function (include named and unamed arguments)
+ARGN: Like ARGV, except this only contains arguments beyond the named ones
+- In addition to the above, each individual argument can be referenced with a name of the form ARGVx where x is the 
+number of the argument (e.g. ARGV0, ARGV1, etc.).
+
+8.3 Keyword arguments:
+- Create something like:
+    target_link_libraries(targetName
+    <PRIVATE|PUBLIC|INTERFACE> item1 [item2 ...]
+    [<PRIVATE|PUBLIC|INTERFACE> item3 [item4 ...]]
+    ...
+    )
+- Use cmake_parse_arguments() command:
+*** Syntax:
+# Needed only for CMake 3.4 and earlier
+include(CMakeParseArguments)
+
+cmake_parse_arguments(
+    prefix
+    valuelessKeywords singleValueKeywords multiValueKeywords
+    argsToParse...
+)
+
+# Available with CMake 3.7 or later, do not use in macros
+cmake_parse_arguments(
+    PARSE_ARGV startIndex
+    prefix
+    valuelessKeywords singleValueKeywords multiValueKeywords
+)
+
+- When cmake_parse_arguments() returns, variables may be defined whose names consist of the
+specified prefix, an underscore and the name of the keyword they are associated with
+- For example, with a prefix of ARG, the variable corresponding to a keyword named FOO would be ARG_FOO
+- For each of the valuelessKeywords, the corresponding variable will be defined with the value TRUE if the
+keyword is present or FALSE if it is not
+- For each of the singleValueKeywords and multiValueKeywords, the corresponding variable will only be defined
+if that keyword is present and a value is provided after the keyword
+- The cmake_parse_arguments() command provides all leftover arguments as a list in the
+variable <prefix>_UNPARSED_ARGUMENTS.
+- With CMake 3.15 or later, the <prefix>_KEYWORDS_MISSING_VALUES variable will be populated with a list containing all
+single- or multi-value keywords that were present but which did not have any value following
+them
