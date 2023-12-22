@@ -110,15 +110,15 @@ function(libWithTest)
     # Second level of arguments
     set(args SOURCES PRIVATE_LIBS PUBLIC_LIBS)
     cmake_parse_arguments(LIB "" "TARGET" "${args}" ${GRP_LIB})
-    cmake_parse_arguments(LIB "" "TARGET" "${args}" ${GRP_TEST})
+    cmake_parse_arguments(TEST "" "TARGET" "${args}" ${GRP_TEST})
     
-    add_library(${LIB_TARGET} ${SOURCES})
+    add_library(${LIB_TARGET} ${LIB_SOURCES})
     target_link_libraries(${LIB_TARGET}
         PUBLIC  ${LIB_PUBLIC_LIBS}
         PRIVATE ${LIB_PRIVATE_LIBS}
     )
 
-    add_executable(${TEST_TARGET} ${SOURCES})
+    add_executable(${TEST_TARGET} ${TEST_SOURCES})
     target_link_libraries(${TEST_TARGET}
         PUBLIC  ${TEST_PUBLIC_LIBS}
         PRIVATE ${TEST_PRIVATE_LIBS}
