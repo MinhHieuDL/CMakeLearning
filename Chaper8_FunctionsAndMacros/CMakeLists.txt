@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.25)
 
 project(function_And_macro)
+
+# 8.2 - 8.3 Argument Handling Essentials
 
 # WARNING: This macro is misleading
 # Because macros treat their arguments as string substitutions rather than as variables, if they use ARGN in a
@@ -135,3 +137,41 @@ endfunction()
 #         SOURCES algoTest.cpp
 #         PRIVATE_LIBS gtest_main
 # )
+
+# 8.4 Returning Values
+function(doSomething outVar)
+    set(${outVar} 42)
+    return(PROPAGATE ${outVar})
+endfunction()
+
+set(result 24)
+doSomething(result)
+# Here, a variable named result now should holds the value 42
+message("result: ${result}")
+
+# block() statements within the function do not prevent propagation
+# to the function’s caller
+
+function(doChangeVar outVar)
+    set(${outVar} 42)
+    block()
+        set(${outVar} 27)
+        return(PROPAGATE ${outVar})
+    endblock()
+endfunction()
+
+doChangeVar(result)
+# Here, a variable named result now should holds the value 27
+message("result: ${result}")
+
+# With CMake 3.24 and earlier, functions do not support returning a value directly.
+# Use set() and unset() with PARENT_SCOPE keyword to modify the variable in caller scope
+function(changeVarOfCallerScope outVar1 outVar2)
+    set(${outVar1} "First Var 1" PARENT_SCOPE)
+    set(${outVar2} "First Var 2" PARENT_SCOPE)
+endfunction()
+
+changeVarOfCallerScope(myVar otherVar)
+
+message("myVar: ${myVar}")
+message("otherVar: ${otherVar}")

@@ -67,3 +67,26 @@ variable <prefix>_UNPARSED_ARGUMENTS.
 - With CMake 3.15 or later, the <prefix>_KEYWORDS_MISSING_VALUES variable will be populated with a list containing all
 single- or multi-value keywords that were present but which did not have any value following
 them
+
+8.4 Returning Values
+- Functions receive a copy of all variables from the calling scope
+- Variables defined or modified inside a function have no effect on variables of the same name
+outside the function
+-  Macros, on the other hand, share the same variable scope as their caller and can therefore 
+modify the caller’s variables directly.
+8.4.1 Return Values From Functions
+- With CMake 3.25 or later, a function can effectively return values by specifying variables to
+propagate to the caller
+- This is achieved using the PROPAGATE keyword with the return() command
+- For each variable name listed after PROPAGATE, that variable will be updated in the calling scope to have the
+same value as in the function at the point of the return() call
+- If a propagated variable is unset in the function scope, it will also be unset in the calling scope
+- A function should not normally dictate the name of variables to be set in the calling scope. Instead,
+function arguments should be used to tell the function the names of variables to be set in the calling
+scope
+- The return() statement propagates variables to the calling scope. This means any block() statements
+within the function do not prevent propagation to the function’s caller, but they will affect the
+value of the variable(s) being propagate
+- A function should not normally dictate the name of variables to be set in the calling scope. Instead,
+function arguments should be used to tell the function the names of variables to be set in the calling
+scope
