@@ -90,3 +90,11 @@ value of the variable(s) being propagate
 - A function should not normally dictate the name of variables to be set in the calling scope. Instead,
 function arguments should be used to tell the function the names of variables to be set in the calling
 scope
+8.4.2 Returning Values from Macros
+- Macros can "return" specific variables in the same way as functions, specifying the names of
+variables to be set by passing them in as arguments
+- The only difference is that the PARENT_SCOPE keyword should not be used within the macro when calling set() because 
+the macro already modifies the variables in the caller’s scope
+- In fact, about the only reason one would use a macro instead of a function is if many variables need to be set in the calling scope.
+- The behavior of return() within a macro is very different to a function. Because a macro does not introduce a new scope,
+the behavior of the return() statement is dependent on where the macro is called

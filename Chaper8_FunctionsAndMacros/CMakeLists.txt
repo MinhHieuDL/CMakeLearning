@@ -175,3 +175,9 @@ changeVarOfCallerScope(myVar otherVar)
 
 message("myVar: ${myVar}")
 message("otherVar: ${otherVar}")
+
+# The function changeVarOfCallerScope can be implemented using macro like below:
+macro(changeVarOfCallerScopeMacr outVar1 outVar2)
+    set(${outVar1} "First Var 1")
+    set(${outVar2} "First Var 2")
+endmacro()
