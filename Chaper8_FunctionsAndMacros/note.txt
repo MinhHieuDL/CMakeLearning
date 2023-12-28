@@ -111,3 +111,9 @@ same name except with an underscore prepended
 - CMAKE_CURRENT_FUNCTION_LIST_LINE: Holds the line number at which the currently executing function was defined within the file that defined it
 Note: The CMAKE_CURRENT_FUNCTION… variables are only updated for functions, they are not modified inside macro. When executing code for a macro,
 these variables will hold whatever values they had when the macro was called
+
+8.7 Other ways of invoking CMake code
+CMake 3.18 added the cmake_language() command which can be used to invoke arbitrary CMake
+code directly without having to define a function or macro:
+- cmake_language(CALL command [args...])
+- cmake_language(EVAL CODE code...)

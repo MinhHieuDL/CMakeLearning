@@ -181,3 +181,36 @@ macro(changeVarOfCallerScopeMacr outVar1 outVar2)
     set(${outVar1} "First Var 1")
     set(${outVar2} "First Var 2")
 endmacro()
+
+# Calling cmake code using cmake_language cmd with CALL sub-command
+# The following example demonstrates how a generic wrapper can be defined around a set of
+# functions that include a version number in their name
+function(qt_generate_moc)
+    set(cmd qt${QT_DEFAULT_MAJOR_VERSION}_generate_moc)
+
+    cmake_language(CALL ${cmd} ${ARGV})
+endfunction()
+# The above example assumes the QT_DEFAULT_MAJOR_VERSION variable has been set previously. As future
+# Qt major versions are released, the above would continue to work as long as the appropriate
+# versioned command was still provided. The alternative would be to implement an ever-expanding
+# set of if() tests for each version individually
+
+# Calling cmake code using cmake_language cmd with EVAL sub-command
+
+set(myProjTraceCall [=[
+    message("Called ${CMAKE_CURRENT_FUNCTION}")
+    set(__x 0)
+    while(__x LESS ${ARGC})
+        message("   ARGV${__x} = ${ARGV${__x}}")
+        math(EXPR __x "${__x} + 1")
+    endwhile()
+    unset(__x)
+]=])
+
+function(testTrace)
+    cmake_language(EVAL CODE "${myProjTraceCall}")
+endfunction()
+
+testTrace(one two tree)
+
+
