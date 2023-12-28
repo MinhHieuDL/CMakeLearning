@@ -98,3 +98,16 @@ the macro already modifies the variables in the caller’s scope
 - In fact, about the only reason one would use a macro instead of a function is if many variables need to be set in the calling scope.
 - The behavior of return() within a macro is very different to a function. Because a macro does not introduce a new scope,
 the behavior of the return() statement is dependent on where the macro is called
+
+8.5 Overriding commands
+- When function() or macro() is called to define a new command, if a command already exists with
+that name, the undocumented CMake behavior is to make the old command available using the
+same name except with an underscore prepended
+
+8.6 Special variables for functions
+- CMAKE_CURRENT_FUNCTION: Holds the name of the function currently being executed
+- CMAKE_CURRENT_FUNCTION_LIST_FILE: Contains the full path to the file that defined the function currently being executed
+- CMAKE_CURRENT_FUNCTION_LIST_DIR: Holds the absolute directory containing the file that defined the function currently being executed
+- CMAKE_CURRENT_FUNCTION_LIST_LINE: Holds the line number at which the currently executing function was defined within the file that defined it
+Note: The CMAKE_CURRENT_FUNCTION… variables are only updated for functions, they are not modified inside macro. When executing code for a macro,
+these variables will hold whatever values they had when the macro was called
