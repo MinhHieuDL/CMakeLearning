@@ -212,5 +212,3 @@ function(testTrace)
 endfunction()
 
 testTrace(one two tree)
-
-

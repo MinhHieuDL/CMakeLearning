@@ -1,0 +1,72 @@
+- Properties affect just about all aspects of the build process, from how a source file is compiled into
+an object file, right through to the install location of built binaries in a packaged installer
+- They are always attached to a specific entity. Rather than holding a standalone value like a
+variable does, a property provides information specific to the entity it is attached to
+- The names CMake uses for related properties and variables usually follow the same pattern, with
+the variable name being the property name with CMAKE_ prepended
+
+9.1 General property commands
+- CMake provides a number of commands for manipulating properties. The most generic of these,
+set_property() and get_property(), allow setting and getting any property on any type of entity
+
+*** Syntax:
+set_property(entitySpecific
+    [APPEND | APPEND_STRING]
+    PROPERTY propertyName values...
+)
+
+* entitySpecific must be one of the following:
+    GLOBAL
+    DIRECTORY [dir]
+    TARGET targets...
+    SOURCE sources... # Additional options with CMake 3.18
+    INSTALL files...
+    TEST tests...
+    CACHE vars...
+
+get_property(resultVar entitySpecific
+    PROPERTY propertyName
+    [DEFINED | SET | BRIEF_DOCS | FULL_DOCS]
+)
+
+* entitySpecific part is similar to that for set_property() and must be one of the following:
+    GLOBAL
+    DIRECTORY [dir]
+    TARGET target
+    SOURCE source # Additional options with CMake 3.18
+    INSTALL file
+    TEST test
+    CACHE var
+    VARIABLE
+
+- The VARIABLE type is a bit different, with the variable name being specified as the propertyName rather
+than being attached to the VARIABLE keyword
+- If none of the optional keywords are given, the value of the property is stored in the variable named by 'resultVar'
+* The optional keywords can be used to retrieve other details about a property:
+- DEFINED: The result of the retrieval will be a boolean value indicating whether the named property has
+been defined. In the case of VARIABLE scope queries, the result will only be true if the named
+variable has been explicitly defined with the define_property() command (see below)
+- SET: The result of the retrieval will be a boolean value indicating whether the named property has
+been set. It differs from DEFINED in that it queries whether the named property has actually been
+set to some value (the value itself is irrelevant), whereas DEFINED is more about describing what
+the property means. SET is usually what projects need rather than DEFINED in most scenarios. Note
+also that a property can return true for DEFINED and false for SET, or vice versa
+- BRIEF_DOCS: Retrieves the brief documentation string for the named property. If no brief documentation has
+been defined for the property, the result will be the string NOTFOUND
+- FULL_DOCS: Retrieves the full documentation for the named property. If no full documentation has been
+defined for the property, the result will be the string NOTFOUND
+
+CMake use define_property() to controls how that a property is initialized or inherited:
+
+define_property(entityType
+    PROPERTY propertyName
+    [INHERITED]
+    # Mandatory for CMake 3.22 and earlier
+    [BRIEF_DOCS briefDoc [moreBriefDocs...]]
+    [FULL_DOCS fullDoc [moreFullDocs...]]
+    # Requires CMake 3.23 or later
+    [INITIALIZE_FROM_VARIABLE variableName]
+)
+
+- CMake has a large number of pre-defined properties of each type. Developers should consult the
+CMake reference documentation for the available properties and their intended purpose
