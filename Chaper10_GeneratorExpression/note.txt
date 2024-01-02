@@ -17,3 +17,70 @@ of that directory depends on which configuration is being built. A placeholder i
 tell CMake "For whichever configuration is being built, use the directory of the final executable".
 - The generator expression provide a way to encode some logic which is evaluated at configure time, 
 the evaluation is instead delayed until the generation phase when the project files are being written
+
+10.1 Simple Boolean Logic
+- A generator expression is specified using the syntax $<…> where the content between the angle
+brackets can take a few different forms
+- The most basic generator expressions for this are the following:
+*** Syntax:
+$<1:...> # the result of the expression will be the … part
+$<0:...> # the … part is ignored and the expression results in an empty string
+Note:  These are basically the true and false conditional expressions, but unlike for variables, 
+the concept of true and false only allows for these two specific values. Anything other than 0 or 1
+for a conditional expression is rejected by CMake with a fatal error.
+
+Another generator expression can be used to make boolean expression
+evaluation more flexible and ensure content evaluates to 0 or 1:
+*** Syntax:
+$<BOOL:...> # the … content in the same way that the if() command evaluates a boolean constant,
+            # so it understands all the usual special strings like OFF, NO, FALSE and so on
+
+
+Logical operations are also supported:
+*** Syntax:
+$<AND:expr[,expr...]>
+$<OR:expr[,expr...]>
+$<NOT:expr>
+
+With CMake >= 3.8:
+*** Syntax:
+$<IF:expr,val1,val0> # As usual, the expr must evaluate to 1 or 0. The result is val1 if expr evaluates to 1 and val0 if expr
+                     # evaluates to 0. 
+
+Before CMake 3.8, equivalent logic would have to be expressed in the following more verbose way that requires the expression to be given twice:
+*** Syntax:
+$<expr:val1>$<$<NOT:expr>:val0>
+
+Generator expressions can be nested, allowing expressions of arbitrary complexity to be
+constructed. The following examples demonstrate the features discussed so far:
+
+    Expression                  result
+  $<1:foo>                      foo
+  $<0:foo>
+  $<true:foo>                   Error, not a 1 or 0
+  $<$<BOOL:true>:foo>           foo
+  $<$<NOT:0>:foo>               foo
+  $<$<NOT:1>:foo>
+  $<$<NOT:true>:foo>            Error, NOT requires a 1 or 0
+  $<$<AND:1,0>:foo>
+  $<$<OR:1,0>:foo>              foo
+  $<1:$<$<BOOL:false>:foo>>
+  $<IF:$<BOOL:${foo}>,yes,no>   Result will be yes or no depending on ${foo}           
+
+Just like for the if() command, CMake also provides support for testing strings, numbers and
+versions in generator expressions, although the syntax is slightly different. The following all
+evaluate to 1 if the respective condition is satisfied, or 0 otherwise:
+*** Syntax:
+$<STREQUAL:string1,string2>
+$<EQUAL:number1,number2>
+$<VERSION_EQUAL:version1,version2>
+$<VERSION_GREATER:version1,version2>
+$<VERSION_LESS:version1,version2>
+
+Another very useful conditional expression is testing the build type:
+*** Syntax:
+$<CONFIG:arg>
+
+CMake offers even more conditional tests based on things like platform and compiler details,
+CMake policy settings, etc. Developers should consult the CMake reference documentation for the
+full set of supported conditional expressions
