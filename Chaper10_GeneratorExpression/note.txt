@@ -1,0 +1,19 @@
+When running CMake, two quite distinct step invoked:
+1. Configuration step:
+- CMake first reads in and processes the CMakeLists.txt file at the top of the source tree, including any other files it pulls in
+- An internal representation of the project is created as the commands, functions, etc. are executed
+- Most of the output to the console log is produced during this stage, including any content from message() commands
+- At the end of the configure step, the -- Configuring done message is printed to the log
+
+2. Generation step:
+- Once CMake has finished reading and processing the CMakeLists.txt file, it then performs the generation step
+- At this step, the build tool’s project files are created using the internal representation built up in the configure step
+
+Scenario:
+- Since, developers select the configuration at build time, well after CMake has finished.
+This would seem to present a problem if the CMakeLists.txt file wants to do something like 
+copy a file to the same directory as the final executable for a given target, since the location
+of that directory depends on which configuration is being built. A placeholder is needed to
+tell CMake "For whichever configuration is being built, use the directory of the final executable".
+- The generator expression provide a way to encode some logic which is evaluated at configure time, 
+the evaluation is instead delayed until the generation phase when the project files are being written
