@@ -84,3 +84,39 @@ $<CONFIG:arg>
 CMake offers even more conditional tests based on things like platform and compiler details,
 CMake policy settings, etc. Developers should consult the CMake reference documentation for the
 full set of supported conditional expressions
+
+10.2 Target details
+Another common use of generator expressions is to provide information about targets. Any
+property of a target can be obtained with one of the following two forms:
+*** Syntax:
+$<TARGET_PROPERTY:target,property>
+$<TARGET_PROPERTY:property>
+
+- The first form provides the value of the named property from the specified target
+- While the second form will retrieve the property from the target on which the generator expression is being used
+- CMake also provides other expressions which give details about the directory and file name of a target’s built binary:
+  + TARGET_FILE: This will yield the absolute path and file name of the target’s binary, including any file prefix
+  and suffix if relevant for the platform (e.g .exe, .dylib). For Unix-based platforms where shared
+  libraries typically have version details in their file name, these will also be included
+  + TARGET_FILE_NAME: Same as TARGET_FILE but without the path (i.e. it provides just the file name part)
+  + TARGET_FILE_DIR: Same as TARGET_FILE but without the file name. This is the most robust way to obtain the
+  directory in which the final executable or library is built. Its value is different for different build
+  configurations when using a multi configuration generator like Xcode, Visual Studio or Ninja
+  Multi-Config
+
+CMake allows a library target to be defined as an object library, meaning it isn’t a library in the usual sense,
+it is just a collection of object files that CMake associates with a target but doesn’t actually result in a final
+library file being created. Here is examples
+*** Code: (CMake >= 3.11)
+# Define an object library
+add_library(ObjLib OBJECT src1.cpp src2.cpp)
+
+# Define two executables which each have their own source
+# file as well as the object files from ObjLib
+add_executable(App1 app1.cpp $<TARGET_OBJECTS:ObjLib>)
+add_executable(App2 app2.cpp $<TARGET_OBJECTS:ObjLib>)
+
+- In the above example, no separate library is created for ObjLib, but the src1.cpp and src2.cpp source
+files are still only compiled once.
+- From CMake 3.12, it is possible to link directly to an object library instead of using
+$<TARGET_OBJECTS:…> as outlined above
