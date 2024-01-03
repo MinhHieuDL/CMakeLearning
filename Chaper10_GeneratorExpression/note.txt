@@ -120,3 +120,25 @@ add_executable(App2 app2.cpp $<TARGET_OBJECTS:ObjLib>)
 files are still only compiled once.
 - From CMake 3.12, it is possible to link directly to an object library instead of using
 $<TARGET_OBJECTS:…> as outlined above
+
+10.3 General Information
+Some of the more common ones are listed here as a starting point for further reading:
+$<CONFIG>
+  Evaluates to the build type. Use this in preference to the CMAKE_BUILD_TYPE variable since that
+  variable is not used on multi configuration project generators like Xcode, Visual Studio or Ninja
+  Multi-Config. Earlier versions of CMake used the now deprecated $<CONFIGURATION> expression for
+  this, but projects should now only use $<CONFIG>.
+
+$<PLATFORM_ID>
+  Identifies the platform for which the target is being built. This can be useful in cross-compiling
+  situations, especially where a build may support multiple platforms (e.g. device and simulator
+  builds). This generator expression is closely related to the CMAKE_SYSTEM_NAME variable and projects
+  should consider whether using that variable would be simpler in their specific situation
+
+$<C_COMPILER_VERSION>, $<CXX_COMPILER_VERSION>
+  In some situations, it may be useful to only add content if the compiler version is older or newer
+  than some particular version. This is achievable with the help of the $<VERSION_xxx:…> generator
+  expressions. For example, to produce the string OLDCXX if the C++ compiler version is less than
+  4.2.0, the following expression could be used:
+  ***Code:
+  $<$<VERSION_LESS:$<CXX_COMPILER_VERSION>,4.2.0>:OLDCXX>
